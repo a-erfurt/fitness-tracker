@@ -1,0 +1,13 @@
+# IDEs
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.python-version
+
+# Env / Secrets
+.env
+
+# OS
+.DS_Store
