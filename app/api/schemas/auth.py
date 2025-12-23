@@ -9,3 +9,7 @@ class RegisterRequest(BaseModel):
 class RegisterResponse(BaseModel):
     id: int
     email: EmailStr
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
