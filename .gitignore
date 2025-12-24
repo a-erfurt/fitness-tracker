@@ -1,13 +1,16 @@
-# IDEs
-.idea/
-
 # Python
+.venv/
 __pycache__/
 *.pyc
 .python-version
 
-# Env / Secrets
+# Env
 .env
+.env.*
+
+# IDE
+.idea/
+.vscode/
 
 # OS
 .DS_Store
