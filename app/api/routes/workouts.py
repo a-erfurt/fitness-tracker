@@ -12,6 +12,9 @@ from app.models.exercise import Exercise
 from app.models.workout_set import WorkoutSet
 from app.api.schemas.workout import WorkoutDetailResponse
 from app.api.schemas.workout import WorkoutSetUpdateRequest
+from app.api.schemas.workout import WorkoutFromPlanResponse
+from app.models.workout_plan import WorkoutPlan
+from app.models.workout_plan_item import WorkoutPlanItem
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 
@@ -344,3 +347,89 @@ def delete_set(
     db.delete(s)
     db.commit()
     return None
+
+@router.post(
+    "/from-plan/{plan_id}",
+    response_model=WorkoutFromPlanResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def start_workout_from_plan(
+    plan_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> WorkoutFromPlanResponse:
+    plan = (
+        db.query(WorkoutPlan)
+        .filter(WorkoutPlan.id == plan_id)
+        .filter(WorkoutPlan.user_id == current_user.id)
+        .first()
+    )
+    if not plan:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
+
+    items = (
+        db.query(WorkoutPlanItem)
+        .filter(WorkoutPlanItem.plan_id == plan.id)
+        .order_by(WorkoutPlanItem.position.asc(), WorkoutPlanItem.id.asc())
+        .all()
+    )
+
+    w = Workout(
+        user_id=current_user.id,
+        started_at=datetime.now(tz=timezone.utc),
+        ended_at=None,
+        notes=f"From plan: {plan.name}",
+    )
+    db.add(w)
+    db.commit()
+    db.refresh(w)
+
+    created_sets = 0
+
+    for item in items:
+        ex = (
+            db.query(Exercise)
+            .filter(Exercise.id == item.exercise_id)
+            .filter(Exercise.user_id == current_user.id)
+            .first()
+        )
+        if not ex:
+            # If exercise was deleted, skip silently for now
+            continue
+
+        # If target_sets not set -> don't auto-create sets
+        if not item.target_sets:
+            continue
+
+        for n in range(1, item.target_sets + 1):
+            s = WorkoutSet(
+                workout_id=w.id,
+                exercise_id=ex.id,
+                set_number=n,
+                reps=item.target_reps,
+                weight_kg=item.target_weight_kg,
+                duration_seconds=item.target_duration_seconds,
+                distance_meters=item.target_distance_meters,
+            )
+
+            # Validate final set values against tracking type
+            validate_set_payload(
+                ex.tracking_type,
+                s.reps,
+                s.weight_kg,
+                s.duration_seconds,
+                s.distance_meters,
+            )
+
+            db.add(s)
+            created_sets += 1
+
+    db.commit()
+
+    return WorkoutFromPlanResponse(
+        id=w.id,
+        started_at=w.started_at,
+        ended_at=w.ended_at,
+        notes=w.notes,
+        created_sets=created_sets,
+    )

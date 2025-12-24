@@ -50,3 +50,6 @@ class WorkoutSetResponse(BaseModel):
 
 class WorkoutDetailResponse(WorkoutResponse):
     sets: list[WorkoutSetResponse]
+
+class WorkoutFromPlanResponse(WorkoutResponse):
+    created_sets: int
