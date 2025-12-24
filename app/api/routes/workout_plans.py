@@ -14,6 +14,7 @@ from app.models.exercise import Exercise
 from app.models.user import User
 from app.models.workout_plan import WorkoutPlan
 from app.models.workout_plan_item import WorkoutPlanItem
+from app.api.schemas.plan_reorder import PlanReorderRequest
 
 router = APIRouter(prefix="/plans", tags=["plans"])
 
@@ -199,6 +200,49 @@ def update_item(
         target_duration_seconds=item.target_duration_seconds,
         target_distance_meters=item.target_distance_meters,
     )
+
+
+@router.put(
+    "/{plan_id}/reorder",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def reorder_items(
+        plan_id: int,
+        payload: PlanReorderRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+) -> None:
+    plan = (
+        db.query(WorkoutPlan)
+        .filter(WorkoutPlan.id == plan_id)
+        .filter(WorkoutPlan.user_id == current_user.id)
+        .first()
+    )
+    if not plan:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
+
+    item_ids = [x.item_id for x in payload.items]
+
+    items = (
+        db.query(WorkoutPlanItem)
+        .filter(WorkoutPlanItem.plan_id == plan.id)
+        .filter(WorkoutPlanItem.id.in_(item_ids))
+        .all()
+    )
+
+    if len(items) != len(item_ids):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="One or more items do not belong to this plan",
+        )
+
+    pos_map = {x.item_id: x.position for x in payload.items}
+
+    for it in items:
+        it.position = pos_map[it.id]
+
+    db.commit()
+    return None
 
 
 @router.delete(
