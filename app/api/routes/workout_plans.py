@@ -276,3 +276,55 @@ def delete_item(
     db.delete(item)
     db.commit()
     return None
+
+
+@router.post(
+    "/{plan_id}/duplicate",
+    response_model=WorkoutPlanResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def duplicate_plan(
+        plan_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+) -> WorkoutPlanResponse:
+    plan = (
+        db.query(WorkoutPlan)
+        .filter(WorkoutPlan.id == plan_id)
+        .filter(WorkoutPlan.user_id == current_user.id)
+        .first()
+    )
+    if not plan:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
+
+    items = (
+        db.query(WorkoutPlanItem)
+        .filter(WorkoutPlanItem.plan_id == plan.id)
+        .order_by(WorkoutPlanItem.position.asc(), WorkoutPlanItem.id.asc())
+        .all()
+    )
+
+    new_plan = WorkoutPlan(
+        user_id=current_user.id,
+        name=f"{plan.name} (copy)",
+    )
+    db.add(new_plan)
+    db.commit()
+    db.refresh(new_plan)
+
+    for it in items:
+        new_item = WorkoutPlanItem(
+            plan_id=new_plan.id,
+            exercise_id=it.exercise_id,
+            position=it.position,
+            target_sets=it.target_sets,
+            target_reps=it.target_reps,
+            target_weight_kg=it.target_weight_kg,
+            target_duration_seconds=it.target_duration_seconds,
+            target_distance_meters=it.target_distance_meters,
+        )
+        db.add(new_item)
+
+    db.commit()
+
+    return WorkoutPlanResponse(id=new_plan.id, name=new_plan.name)
