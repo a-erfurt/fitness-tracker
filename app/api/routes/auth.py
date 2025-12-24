@@ -21,8 +21,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     status_code=status.HTTP_201_CREATED,
 )
 def register(
-    payload: RegisterRequest,
-    db: Session = Depends(get_db),
+        payload: RegisterRequest,
+        db: Session = Depends(get_db),
 ) -> RegisterResponse:
     # 1) Prüfen, ob Email schon existiert
     existing_user = (
@@ -56,14 +56,15 @@ def register(
         email=payload.email,
     )
 
+
 @router.post(
     "/login",
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
 )
 def login(
-    payload: LoginRequest,
-    db: Session = Depends(get_db),
+        payload: LoginRequest,
+        db: Session = Depends(get_db),
 ) -> TokenResponse:
     user = db.query(User).filter(User.email == str(payload.email)).first()
 
@@ -75,6 +76,7 @@ def login(
 
     access_token = create_access_token(subject=str(user.id))
     return TokenResponse(access_token=access_token)
+
 
 @router.get(
     "/me",

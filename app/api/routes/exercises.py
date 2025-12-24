@@ -21,9 +21,9 @@ def normalize_name(name: str) -> str:
 
 @router.post("", response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
 def create_exercise(
-    payload: ExerciseCreateRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        payload: ExerciseCreateRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> ExerciseResponse:
     normalized = normalize_name(payload.name)
 
@@ -67,11 +67,11 @@ def create_exercise(
 
 @router.get("", response_model=list[ExerciseResponse], status_code=status.HTTP_200_OK)
 def list_exercises(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    q: str | None = Query(default=None),
-    limit: int = Query(default=50, ge=1, le=200),
-    offset: int = Query(default=0, ge=0),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+        q: str | None = Query(default=None),
+        limit: int = Query(default=50, ge=1, le=200),
+        offset: int = Query(default=0, ge=0),
 ) -> list[ExerciseResponse]:
     query = db.query(Exercise).filter(Exercise.user_id == current_user.id)
 
@@ -99,15 +99,16 @@ def list_exercises(
         for e in items
     ]
 
+
 @router.post(
     "/from-template/{template_id}",
     response_model=ExerciseResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_exercise_from_template(
-    template_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        template_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> ExerciseResponse:
     template = db.query(ExerciseTemplate).filter(ExerciseTemplate.id == template_id).first()
     if not template:
@@ -158,16 +159,17 @@ def create_exercise_from_template(
         tracking_type=ex.tracking_type,
     )
 
+
 @router.put(
     "/{exercise_id}",
     response_model=ExerciseResponse,
     status_code=status.HTTP_200_OK,
 )
 def update_exercise(
-    exercise_id: int,
-    payload: ExerciseUpdateRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        exercise_id: int,
+        payload: ExerciseUpdateRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> ExerciseResponse:
     ex = (
         db.query(Exercise)
@@ -224,14 +226,15 @@ def update_exercise(
         tracking_type=ex.tracking_type,
     )
 
+
 @router.delete(
     "/{exercise_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_exercise(
-    exercise_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        exercise_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> None:
     ex = (
         db.query(Exercise)

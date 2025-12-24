@@ -18,6 +18,7 @@ from app.models.workout_plan_item import WorkoutPlanItem
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 
+
 def validate_set_payload(tracking_type: str, reps, weight_kg, duration_seconds, distance_meters) -> None:
     if tracking_type == "weight_reps":
         if reps is None or weight_kg is None:
@@ -41,9 +42,9 @@ def validate_set_payload(tracking_type: str, reps, weight_kg, duration_seconds, 
 
 @router.post("", response_model=WorkoutResponse, status_code=status.HTTP_201_CREATED)
 def start_workout(
-    payload: WorkoutCreateRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        payload: WorkoutCreateRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutResponse:
     started_at = payload.started_at or datetime.now(tz=timezone.utc)
 
@@ -67,9 +68,9 @@ def start_workout(
 
 @router.post("/{workout_id}/end", response_model=WorkoutResponse, status_code=status.HTTP_200_OK)
 def end_workout(
-    workout_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        workout_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutResponse:
     w = (
         db.query(Workout)
@@ -95,16 +96,17 @@ def end_workout(
         notes=w.notes,
     )
 
+
 @router.post(
     "/{workout_id}/sets",
     response_model=WorkoutSetResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def add_set(
-    workout_id: int,
-    payload: WorkoutSetCreateRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        workout_id: int,
+        payload: WorkoutSetCreateRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutSetResponse:
     # Workout must belong to user
     w = (
@@ -173,12 +175,13 @@ def add_set(
         distance_meters=s.distance_meters,
     )
 
+
 @router.get("", response_model=list[WorkoutResponse], status_code=status.HTTP_200_OK)
 def list_workouts(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-    limit: int = 50,
-    offset: int = 0,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+        limit: int = 50,
+        offset: int = 0,
 ) -> list[WorkoutResponse]:
     items = (
         db.query(Workout)
@@ -199,11 +202,12 @@ def list_workouts(
         for w in items
     ]
 
+
 @router.get("/{workout_id}", response_model=WorkoutDetailResponse, status_code=status.HTTP_200_OK)
 def get_workout(
-    workout_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        workout_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutDetailResponse:
     w = (
         db.query(Workout)
@@ -240,17 +244,18 @@ def get_workout(
         ],
     )
 
+
 @router.put(
     "/{workout_id}/sets/{set_id}",
     response_model=WorkoutSetResponse,
     status_code=status.HTTP_200_OK,
 )
 def update_set(
-    workout_id: int,
-    set_id: int,
-    payload: WorkoutSetUpdateRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        workout_id: int,
+        set_id: int,
+        payload: WorkoutSetUpdateRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutSetResponse:
     # Workout must belong to user
     w = (
@@ -316,15 +321,16 @@ def update_set(
         distance_meters=s.distance_meters,
     )
 
+
 @router.delete(
     "/{workout_id}/sets/{set_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_set(
-    workout_id: int,
-    set_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        workout_id: int,
+        set_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> None:
     w = (
         db.query(Workout)
@@ -348,15 +354,16 @@ def delete_set(
     db.commit()
     return None
 
+
 @router.post(
     "/from-plan/{plan_id}",
     response_model=WorkoutFromPlanResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def start_workout_from_plan(
-    plan_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        plan_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutFromPlanResponse:
     plan = (
         db.query(WorkoutPlan)

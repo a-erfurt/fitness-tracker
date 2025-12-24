@@ -17,8 +17,8 @@ router = APIRouter(prefix="/progress", tags=["progress"])
 
 @router.get("/prs", response_model=list[ExercisePRResponse], status_code=status.HTTP_200_OK)
 def list_personal_records(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> list[ExercisePRResponse]:
     # Load all user exercises
     exercises = (
@@ -98,15 +98,16 @@ def list_personal_records(
 
     return results
 
+
 @router.get(
     "/exercises/{exercise_id}/history",
     response_model=ExerciseHistoryResponse,
     status_code=status.HTTP_200_OK,
 )
 def exercise_history(
-    exercise_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        exercise_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> ExerciseHistoryResponse:
     ex = (
         db.query(Exercise)
@@ -167,14 +168,15 @@ def exercise_history(
         points=points,
     )
 
+
 @router.get(
     "/overview",
     response_model=ProgressOverviewResponse,
     status_code=status.HTTP_200_OK,
 )
 def overview(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> ProgressOverviewResponse:
     now = datetime.now(tz=timezone.utc)
 
@@ -183,22 +185,22 @@ def overview(
 
     # Workouts this week
     workouts_this_week = (
-        db.query(func.count(Workout.id))
-        .filter(Workout.user_id == current_user.id)
-        .filter(Workout.started_at >= start_of_week)
-        .filter(Workout.started_at <= now)
-        .scalar()
-    ) or 0
+                             db.query(func.count(Workout.id))
+                             .filter(Workout.user_id == current_user.id)
+                             .filter(Workout.started_at >= start_of_week)
+                             .filter(Workout.started_at <= now)
+                             .scalar()
+                         ) or 0
 
     # Sets this week (join sets -> workouts in range)
     sets_this_week = (
-        db.query(func.count(WorkoutSet.id))
-        .join(Workout, Workout.id == WorkoutSet.workout_id)
-        .filter(Workout.user_id == current_user.id)
-        .filter(Workout.started_at >= start_of_week)
-        .filter(Workout.started_at <= now)
-        .scalar()
-    ) or 0
+                         db.query(func.count(WorkoutSet.id))
+                         .join(Workout, Workout.id == WorkoutSet.workout_id)
+                         .filter(Workout.user_id == current_user.id)
+                         .filter(Workout.started_at >= start_of_week)
+                         .filter(Workout.started_at <= now)
+                         .scalar()
+                     ) or 0
 
     # Top exercises this week by number of sets
     rows = (

@@ -34,14 +34,14 @@ class ExerciseTemplate(Base):
     # Optional media (URL only, later you can point to your own images/CDN)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
-    category: Mapped[str] = mapped_column(String(50), nullable=False)      # e.g. strength/cardio
-    equipment: Mapped[str] = mapped_column(String(50), nullable=False)     # barbell/dumbbell/machine/body only
-    tracking_type: Mapped[str] = mapped_column(String(30), nullable=False) # weight_reps/time/distance
+    category: Mapped[str] = mapped_column(String(50), nullable=False)  # e.g. strength/cardio
+    equipment: Mapped[str] = mapped_column(String(50), nullable=False)  # barbell/dumbbell/machine/body only
+    tracking_type: Mapped[str] = mapped_column(String(30), nullable=False)  # weight_reps/time/distance
 
     # Extra dataset metadata (useful for filters)
-    force: Mapped[str | None] = mapped_column(String(20), nullable=True)      # push/pull/static
-    level: Mapped[str | None] = mapped_column(String(20), nullable=True)      # beginner/...
-    mechanic: Mapped[str | None] = mapped_column(String(20), nullable=True)   # compound/isolation
+    force: Mapped[str | None] = mapped_column(String(20), nullable=True)  # push/pull/static
+    level: Mapped[str | None] = mapped_column(String(20), nullable=True)  # beginner/...
+    mechanic: Mapped[str | None] = mapped_column(String(20), nullable=True)  # compound/isolation
 
     primary_muscles: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
     secondary_muscles: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)

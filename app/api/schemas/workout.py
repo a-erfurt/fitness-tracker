@@ -28,6 +28,7 @@ class WorkoutSetCreateRequest(BaseModel):
     duration_seconds: int | None = Field(default=None, ge=1)
     distance_meters: int | None = Field(default=None, ge=1)
 
+
 class WorkoutSetUpdateRequest(BaseModel):
     set_number: int | None = Field(default=None, ge=1)
 
@@ -48,8 +49,10 @@ class WorkoutSetResponse(BaseModel):
     duration_seconds: int | None
     distance_meters: int | None
 
+
 class WorkoutDetailResponse(WorkoutResponse):
     sets: list[WorkoutSetResponse]
+
 
 class WorkoutFromPlanResponse(WorkoutResponse):
     created_sets: int

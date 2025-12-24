@@ -8,6 +8,7 @@ from app.core.tokens import decode_access_token
 from app.models.user import User
 
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 bearer_scheme = HTTPBearer()
 
 
@@ -20,8 +21,8 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_current_user(
-    db: Session = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+        db: Session = Depends(get_db),
+        credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> User:
     try:
         payload = decode_access_token(credentials.credentials)

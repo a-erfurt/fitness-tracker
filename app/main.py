@@ -14,9 +14,11 @@ app.include_router(workouts_router)
 app.include_router(progress_router)
 app.include_router(workout_plans_router)
 
+
 @app.get("/")
 def root() -> dict:
     return {"name": "Fitness Tracker API", "version": "0.1.0"}
+
 
 @app.get("/health")
 def health() -> dict:

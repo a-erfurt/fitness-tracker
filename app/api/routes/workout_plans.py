@@ -140,17 +140,18 @@ def add_item(
         target_distance_meters=item.target_distance_meters,
     )
 
+
 @router.put(
     "/{plan_id}/items/{item_id}",
     response_model=WorkoutPlanItemResponse,
     status_code=status.HTTP_200_OK,
 )
 def update_item(
-    plan_id: int,
-    item_id: int,
-    payload: WorkoutPlanItemUpdateRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        plan_id: int,
+        item_id: int,
+        payload: WorkoutPlanItemUpdateRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ) -> WorkoutPlanItemResponse:
     plan = (
         db.query(WorkoutPlan)
@@ -198,6 +199,7 @@ def update_item(
         target_duration_seconds=item.target_duration_seconds,
         target_distance_meters=item.target_distance_meters,
     )
+
 
 @router.delete(
     "/{plan_id}/items/{item_id}",

@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from app.core.db import SessionLocal
 from app.models.exercise_template import ExerciseTemplate
 
-
 DATA_FILE = Path("data/free-exercise-db.exercises.json")
 
 
@@ -60,8 +59,8 @@ def seed() -> None:
                 source_id=source_id,
                 slug=slugify(source_id),
                 name=name,
-                description=None,      # keep null for now (LP later)
-                image_url=None,        # you will add your own images later
+                description=None,  # keep null for now (LP later)
+                image_url=None,  # you will add your own images later
                 category=category,
                 equipment=equipment,
                 tracking_type=map_tracking_type(category),

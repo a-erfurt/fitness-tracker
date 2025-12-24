@@ -10,15 +10,15 @@ router = APIRouter(prefix="/exercise-templates", tags=["exercise-templates"])
 
 @router.get("", response_model=list[ExerciseTemplateResponse], status_code=status.HTTP_200_OK)
 def list_templates(
-    response: Response,
-    db: Session = Depends(get_db),
-    q: str | None = Query(default=None, description="Search by name (contains)"),
-    category: str | None = Query(default=None),
-    equipment: str | None = Query(default=None),
-    tracking_type: str | None = Query(default=None),
-    muscle: str | None = Query(default=None, description="Matches primary/secondary muscles"),
-    limit: int = Query(default=50, ge=1, le=200),
-    offset: int = Query(default=0, ge=0),
+        response: Response,
+        db: Session = Depends(get_db),
+        q: str | None = Query(default=None, description="Search by name (contains)"),
+        category: str | None = Query(default=None),
+        equipment: str | None = Query(default=None),
+        tracking_type: str | None = Query(default=None),
+        muscle: str | None = Query(default=None, description="Matches primary/secondary muscles"),
+        limit: int = Query(default=50, ge=1, le=200),
+        offset: int = Query(default=0, ge=0),
 ) -> list[ExerciseTemplateResponse]:
     query = db.query(ExerciseTemplate)
 
