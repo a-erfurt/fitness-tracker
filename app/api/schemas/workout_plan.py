@@ -20,6 +20,14 @@ class WorkoutPlanItemCreateRequest(BaseModel):
     target_duration_seconds: int | None = Field(default=None, ge=1)
     target_distance_meters: int | None = Field(default=None, ge=1)
 
+class WorkoutPlanItemUpdateRequest(BaseModel):
+    position: int | None = Field(default=None, ge=1)
+
+    target_sets: int | None = Field(default=None, ge=1)
+    target_reps: int | None = Field(default=None, ge=1)
+    target_weight_kg: float | None = Field(default=None, ge=0)
+    target_duration_seconds: int | None = Field(default=None, ge=1)
+    target_distance_meters: int | None = Field(default=None, ge=1)
 
 class WorkoutPlanItemResponse(BaseModel):
     id: int
